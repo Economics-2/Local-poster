@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editable Poster Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Tiro+Bangla&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        :root {
+            --primary-red: #d30000;
+            --primary-blue: #0056b3;
+            --primary-green: #008000;
+            --bg-gradient: linear-gradient(135deg, #e0f7fa 0%, #ffffff 100%);
+        }
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Controls Section */
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 600px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .controls h3 { grid-column: span 2; margin-top: 0; }
+        .controls input, .controls textarea {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .full-width { grid-column: span 2; }
+        
+        button#downloadBtn {
+            grid-column: span 2;
+            padding: 12px;
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        button#downloadBtn:hover { background: #003d82; }
+
+        /* Poster Layout */
+        #poster-container {
+            width: 500px; /* Fixed width for consistency */
+            height: 750px;
+            background: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Bismillah */
+        .header-top {
+            text-align: center;
+            font-size: 12px;
+            padding-top: 5px;
+            color: #333;
+        }
+
+        /* Abstract Wave Background (Top Right) */
+        .top-bg-wave {
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, #f9f237 10%, #6cd136 40%, #0099ff 70%);
+            border-radius: 50%;
+            z-index: 0;
+            opacity: 0.6;
+            filter: blur(20px);
+        }
+
+        /* Main Content Area */
+        .main-section {
+            display: flex;
+            height: 60%;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Left Logo Area */
+        .logo-area {
+            width: 55%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-top: 20px;
+        }
+
+        .circle-badge {
+            width: 220px;
+            height: 220px;
+            background: white;
+            border-radius: 50%;
+            border: 5px solid #0099ff;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3), inset 0 0 20px rgba(0,153,255,0.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Drip Effect Simulation */
+        .circle-badge::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            left: 20px;
+            width: 180px;
+            height: 60px;
+            background: #0099ff;
+            border-radius: 50%;
+            filter: blur(15px);
+            z-index: -1;
+            opacity: 0.7;
+        }
+
+        .logo-top-text {
+            color: #008000;
+            font-size: 32px;
+            font-weight: bold;
+            line-height: 1;
+        }
+        .logo-main-text {
+            color: var(--primary-red);
+            font-family: 'Tiro Bangla', serif;
+            font-size: 65px;
+            font-weight: bold;
+            line-height: 0.9;
+            text-shadow: 1px 1px 2px #aaa;
+        }
+        .logo-sub-text {
+            color: #008000;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        /* Right Side: Photo & Buttons */
+        .right-area {
+            width: 45%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            padding-right: 15px;
+            padding-top: 10px;
+        }
+
+        .photo-frame {
+            width: 140px;
+            height: 160px;
+            overflow: hidden;
+            border-radius: 10px;
+            border: 3px solid white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+            background: #ddd;
+            position: relative;
+        }
+        
+        .photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .side-btn {
+            width: 160px;
+            padding: 8px 10px;
+            margin-bottom: 8px;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 5px 0 0 5px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+            font-size: 16px;
+            position: relative;
+        }
+        
+        /* Button Gradients */
+        .btn-red { background: linear-gradient(to right, #cc0000, #ff4d4d); }
+        .btn-orange { background: linear-gradient(to right, #d35400, #e67e22); }
+        .btn-green { background: linear-gradient(to right, #4caf50, #8bc34a); }
+        .btn-blue { background: linear-gradient(to right, #0056b3, #2196f3); }
+
+        /* Services List Section */
+        .services-section {
+            flex-grow: 1;
+            background: linear-gradient(to bottom, #f0fbff, #dcf2fa);
+            padding: 10px 20px;
+            position: relative;
+        }
+
+        .service-title {
+            color: var(--primary-red);
+            font-weight: bold;
+            font-size: 20px;
+            margin-bottom: 5px;
+            border-bottom: 2px solid var(--primary-red);
+            display: inline-block;
+        }
+
+        .services-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .service-item {
+            font-size: 16px;
+            color: #004d40;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .service-item::before {
+            content: '❖';
+            color: red;
+            margin-right: 5px;
+            font-size: 14px;
+        }
+
+        .extra-services {
+            text-align: center;
+            margin-top: 10px;
+            color: #0056b3;
+            font-weight: bold;
+            font-size: 18px;
+            line-height: 1.4;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--primary-red);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+        }
+        .footer-address {
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+        .footer-contact {
+            font-size: 13px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <h3>ডিজাইন এডিট প্যানেল</h3>
+        
+        <input type="text" id="in_topText" placeholder="টপ টেক্সট (এস আর)" value="এস আর">
+        <input type="text" id="in_midText" placeholder="মাঝের টেক্সট (সাইন)" value="সাইন">
+        <input type="text" id="in_subText" placeholder="নিচের টেক্সট (মিডিয়া)" value="মিডিয়া">
+        
+        <input type="file" id="in_photo" accept="image/*" class="full-width">
+        
+        <input type="text" id="in_btn1" value="ডিজিটাল প্রিন্ট">
+        <input type="text" id="in_btn2" value="অফসেট প্রিন্ট">
+        <input type="text" id="in_btn3" value="স্টুডিও">
+        <input type="text" id="in_btn4" value="কম্পিউটার ট্রেনিং">
+        
+        <textarea id="in_services" class="full-width" rows="3" placeholder="সেবা সমূহ (কমা দিয়ে লিখুন)">পোস্টার, লিফলেট, ক্যাশমেমো, ক্যালেন্ডার, ভিজিটিং কার্ড, আইডি কার্ড, মগ, ক্রেস্ট, গেঞ্জি, নন ওভেন টিস্যু ব্যাগ</textarea>
+        
+        <input type="text" id="in_address" class="full-width" placeholder="ঠিকানা" value="কলেজ রোড (২য় তলা), বাঞ্ছারামপুর, ব্রাহ্মণবাড়িয়া।">
+        <input type="text" id="in_mobile" placeholder="মোবাইল" value="+88-01791 224466">
+        <input type="text" id="in_email" placeholder="ইমেইল" value="srsignmedia@yahoo.com">
+        
+        <button id="downloadBtn">ডাউনলোড ইমেজ (JPG)</button>
+    </div>
+
+    <div id="poster-container">
+        <div class="top-bg-wave"></div>
+        
+        <div class="header-top">বিসমিল্লাহির রাহমানির রাহিম</div>
+
+        <div class="main-section">
+            <div class="logo-area">
+                <div class="circle-badge">
+                    <div class="logo-top-text" id="out_topText">এস আর</div>
+                    <div class="logo-main-text" id="out_midText">সাইন</div>
+                    <div class="logo-sub-text" id="out_subText">মিডিয়া</div>
+                </div>
+            </div>
+
+            <div class="right-area">
+                <div class="photo-frame">
+                    <img id="out_photo" src="https://via.placeholder.com/150" alt="Person">
+                </div>
+                <div class="side-btn btn-red" id="out_btn1">ডিজিটাল প্রিন্ট</div>
+                <div class="side-btn btn-orange" id="out_btn2">অফসেট প্রিন্ট</div>
+                <div class="side-btn btn-green" id="out_btn3">স্টুডিও</div>
+                <div class="side-btn btn-blue" id="out_btn4">কম্পিউটার ট্রেনিং</div>
+            </div>
+        </div>
+
+        <div class="services-section">
+            <div class="service-title">আমাদের সেবা সমূহ...</div>
+            <div class="services-grid" id="out_services_grid">
+                <div class="service-item">পোস্টার</div>
+                <div class="service-item">লিফলেট</div>
+                <div class="service-item">ক্যাশমেমো</div>
+            </div>
+            
+            <div class="extra-services">
+                ডিজিটাল প্রিন্ট ◆ সাইন বোর্ড ◆ ব্যানার ◆ ফেস্টুন<br>
+                প্যানাফ্লেক্স ◆ ভিনাইল স্টিকার<br>
+                <span style="color: black; font-size: 16px; background: #ddd; padding: 2px 10px; border-radius: 5px;">সহ যাবতীয় ছাপার কাজ করা হয়।</span>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-address" id="out_address">কলেজ রোড (২য় তলা), বাঞ্ছারামপুর, ব্রাহ্মণবাড়িয়া।</div>
+            <div class="footer-contact">
+                <span id="out_mobile">📞 +88-01791 224466</span>
+                <span id="out_email">✉️ srsignmedia@yahoo.com</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Binding Function
+        function bindInput(inputId, outputId) {
+            const input = document.getElementById(inputId);
+            const output = document.getElementById(outputId);
+            
+            input.addEventListener('input', () => {
+                output.innerText = input.value;
+            });
+        }
+
+        // Bind Basic Texts
+        bindInput('in_topText', 'out_topText');
+        bindInput('in_midText', 'out_midText');
+        bindInput('in_subText', 'out_subText');
+        bindInput('in_btn1', 'out_btn1');
+        bindInput('in_btn2', 'out_btn2');
+        bindInput('in_btn3', 'out_btn3');
+        bindInput('in_btn4', 'out_btn4');
+        bindInput('in_address', 'out_address');
+        bindInput('in_mobile', 'out_mobile');
+        bindInput('in_email', 'out_email');
+
+        // Handle Image Upload
+        document.getElementById('in_photo').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    document.getElementById('out_photo').src = event.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Handle Services List (Comma separated)
+        const servicesInput = document.getElementById('in_services');
+        const servicesGrid = document.getElementById('out_services_grid');
+
+        function updateServices() {
+            const items = servicesInput.value.split(',');
+            servicesGrid.innerHTML = '';
+            items.forEach(item => {
+                if(item.trim() !== '') {
+                    const div = document.createElement('div');
+                    div.className = 'service-item';
+                    div.innerText = item.trim();
+                    servicesGrid.appendChild(div);
+                }
+            });
+        }
+        servicesInput.addEventListener('input', updateServices);
+        // Initial call
+        updateServices();
+
+        // Download Function
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            const poster = document.getElementById('poster-container');
+            
+            html2canvas(poster, { scale: 2 }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'my-poster-design.jpg';
+                link.href = canvas.toDataURL('image/jpeg', 0.9);
+                link.click();
+            });
+        });
+    </script>
+</body>
+</html>
